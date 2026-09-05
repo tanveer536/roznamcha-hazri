@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roznamcha Hazri — GPS Jatthay Wala</title>
+<meta name="theme-color" content="#7a2b2b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roznamcha">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' fill='%237a2b2b'/%3E%3Ctext x='50%25' y='68%25' font-size='120' text-anchor='middle' fill='white' font-family='Georgia,serif'%3ER%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' fill='%237a2b2b'/%3E%3Ctext x='50%25' y='68%25' font-size='120' text-anchor='middle' fill='white' font-family='Georgia,serif'%3ER%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Roznamcha%20Hazri%20-%20GPS%20Jatthay%20Wala%22%2C%22short_name%22%3A%22Roznamcha%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f6efdd%22%2C%22theme_color%22%3A%22%237a2b2b%22%7D">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@400;500;600;700&family=Spectral+SC:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6efdd;
+    --paper-deep:#efe4c8;
+    --ink:#2c2211;
+    --rule:#c7b78e;
+    --rule-strong:#a4906258;
+    --maroon:#7a2b2b;
+    --maroon-deep:#5c1f1f;
+    --forest:#345c3f;
+    --present-bg:#e5eee0;
+    --present:#345c3f;
+    --absent-bg:#f5e4e0;
+    --absent:#8a3a2c;
+    --white:#fffdf6;
+    --muted:#6f6349;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper) 0%, var(--paper) 100%);
+    color:var(--ink);
+    font-family:'Spectral', Georgia, serif;
+    min-height:100vh;
+  }
+  .sheet{
+    max-width:1080px;
+    margin:0 auto;
+    padding:36px 28px 90px;
+  }
+
+  /* ---- Register header, styled like a ledger title block ---- */
+  .register-head{
+    border:2px solid var(--ink);
+    padding:22px 26px;
+    background:var(--white);
+    position:relative;
+  }
+  .register-head::before{
+    content:"";
+    position:absolute;
+    inset:6px;
+    border:1px solid var(--rule);
+    pointer-events:none;
+  }
+  .school-name{
+    font-family:'Spectral SC', serif;
+    font-size:1.9rem;
+    font-weight:700;
+    letter-spacing:0.5px;
+    color:var(--maroon-deep);
+    text-align:center;
+    margin:0;
+  }
+  .register-title{
+    text-align:center;
+    font-size:1.05rem;
+    color:var(--ink);
+    margin-top:4px;
+    font-style:italic;
+    letter-spacing:0.3px;
+  }
+  .meta-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    margin-top:18px;
+    font-size:0.95rem;
+  }
+  .meta-row label{
+    color:var(--muted);
+  }
+  input[type=date]{
+    font-family:'Spectral', Georgia, serif;
+    font-size:1rem;
+    padding:6px 12px;
+    border:1px solid var(--rule);
+    border-radius:3px;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  .day-name{
+    color:var(--maroon);
+    font-weight:600;
+  }
+
+  /* ---- Ledger table ---- */
+  .ledger-wrap{
+    margin-top:26px;
+    background:var(--white);
+    border:2px solid var(--ink);
+    overflow-x:auto;
+  }
+  table.ledger{
+    width:100%;
+    border-collapse:collapse;
+    min-width:820px;
+    font-size:0.92rem;
+  }
+  table.ledger thead th{
+    background:var(--paper-deep);
+    border:1px solid var(--rule-strong);
+    padding:10px 8px;
+    font-weight:600;
+    text-align:center;
+    color:var(--maroon-deep);
+  }
+  table.ledger thead tr.group th{
+    font-size:0.78rem;
+    letter-spacing:0.3px;
+    color:var(--muted);
+    background:var(--paper);
+    border-bottom:none;
+  }
+  table.ledger td{
+    border:1px solid var(--rule);
+    padding:9px 8px;
+    text-align:center;
+  }
+  table.ledger td.class-name{
+    text-align:left;
+    font-weight:600;
+    color:var(--ink);
+    white-space:nowrap;
+    padding-left:14px;
+  }
+  table.ledger td.enrolled{
+    color:var(--muted);
+  }
+  table.ledger tbody tr:nth-child(even){
+    background:#fbf7ec;
+  }
+  table.ledger tfoot td{
+    border:1px solid var(--ink);
+    background:var(--paper-deep);
+    font-weight:700;
+    color:var(--maroon-deep);
+  }
+  input.count-input{
+    width:52px;
+    text-align:center;
+    font-family:'Spectral', Georgia, serif;
+    font-size:0.95rem;
+    padding:4px 3px;
+    border:1px solid var(--rule);
+    border-radius:3px;
+    background:var(--paper);
+    color:var(--ink);
+  }
+  input.count-input:focus{
+    outline:2px solid var(--forest);
+    outline-offset:1px;
+  }
+  input.count-input.over-limit{
+    outline:2px solid var(--absent);
+    background:var(--absent-bg);
+  }
+  .absent-cell{
+    color:var(--absent);
+    font-weight:600;
+  }
+  .pct-cell{
+    font-weight:700;
+  }
+
+  .toolbar{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:'Spectral', Georgia, serif;
+    font-size:0.92rem;
+    font-weight:600;
+    border-radius:3px;
+    padding:9px 18px;
+    cursor:pointer;
+    border:1px solid var(--ink);
+    background:var(--white);
+    color:var(--ink);
+  }
+  button.primary{
+    background:var(--maroon);
+    color:var(--white);
+    border-color:var(--maroon-deep);
+  }
+  button:hover{ opacity:0.88; }
+
+  .install-note{
+    background:var(--white);
+    border:1px solid var(--rule);
+    border-left:4px solid var(--maroon);
+    padding:14px 16px;
+    margin-top:14px;
+    font-size:0.9rem;
+    color:var(--ink);
+    display:none;
+  }
+  .install-note.show{ display:block; }
+  .install-note strong{ color:var(--maroon-deep); }
+  .install-note ol{ margin:8px 0 0; padding-left:20px; }
+  .install-note li{ margin-bottom:4px; }
+
+  footer{
+    text-align:center;
+    font-size:0.8rem;
+    color:var(--muted);
+    margin-top:26px;
+    font-style:italic;
+  }
+
+  @media print{
+    body{background:white;}
+    .toolbar{display:none;}
+    .sheet{padding:0;}
+    .register-head, .ledger-wrap{border-color:#000;}
+  }
+
+  @media (max-width: 640px){
+    .school-name{font-size:1.4rem;}
+    .sheet{padding:20px 12px 60px;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <div class="register-head">
+    <h1 class="school-name">GPS Jatthay Wala</h1>
+    <div class="register-title">Roznamcha Hazri — Daily Student Attendance Register</div>
+    <div class="meta-row">
+      <label for="regDate">Date:</label>
+      <input type="date" id="regDate" onchange="renderLedger()">
+      <span class="day-name" id="dayName"></span>
+    </div>
+  </div>
+
+  <div class="ledger-wrap">
+    <table class="ledger">
+      <thead>
+        <tr class="group">
+          <th rowspan="2">#</th>
+          <th rowspan="2">Class</th>
+          <th colspan="3">Enrolled Strength</th>
+          <th colspan="3">Present Today</th>
+          <th rowspan="2">Attendance %</th>
+        </tr>
+        <tr class="group">
+          <th>Boys</th><th>Girls</th><th>Total</th>
+          <th>Boys</th><th>Girls</th><th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="ledgerBody"></tbody>
+      <tfoot>
+        <tr id="ledgerTotals"></tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="toolbar">
+    <button id="installBtn" onclick="handleInstallClick()">Add to Home Screen</button>
+    <button onclick="window.print()">Print register</button>
+    <button class="primary" onclick="exportCSV()">Export CSV</button>
+  </div>
+  <div class="install-note" id="installNote"></div>
+
+  <footer>GPS Jatthay Wala — attendance data is saved in this browser only, on this device.<br>Developed by Tanveer Amjad (PST)</footer>
+</div>
+
+<script>
+  const CLASSES = [
+    { id:'ecce1', name:'ECCE-1',    boys:15, girls:11 },
+    { id:'ecce2', name:'ECCE-2',    boys:5,  girls:6  },
+    { id:'one',   name:'Class One',  boys:5,  girls:10 },
+    { id:'two',   name:'Class Two',  boys:3,  girls:10 },
+    { id:'three', name:'Class Three',boys:9,  girls:8  },
+    { id:'four',  name:'Class Four', boys:5,  girls:9  },
+    { id:'five',  name:'Class Five', boys:4,  girls:2  }
+  ];
+
+  const RECORDS_KEY = 'roznamcha_records'; // { "YYYY-MM-DD": { classId: { boysPresent, girlsPresent } } }
+
+  function loadRecords(){
+    return JSON.parse(localStorage.getItem(RECORDS_KEY) || '{}');
+  }
+  function saveRecords(records){
+    localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+  }
+
+  function todayStr(){
+    const d = new Date();
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off*60000);
+    return local.toISOString().slice(0,10);
+  }
+
+  document.getElementById('regDate').value = todayStr();
+
+  function updateDayName(){
+    const dateVal = document.getElementById('regDate').value;
+    const d = new Date(dateVal + 'T00:00:00');
+    document.getElementById('dayName').textContent = d.toLocaleDateString(undefined, {weekday:'long'});
+  }
+
+  function clamp(val, max){
+    if(isNaN(val) || val < 0) return 0;
+    if(val > max) return max;
+    return val;
+  }
+
+  function onCountChange(classId, field, inputEl, maxVal){
+    const date = document.getElementById('regDate').value;
+    const records = loadRecords();
+    if(!records[date]) records[date] = {};
+    if(!records[date][classId]) records[date][classId] = {};
+
+    let val = parseInt(inputEl.value, 10);
+    if(isNaN(val)) val = null;
+
+    if(val !== null && val > maxVal){
+      inputEl.classList.add('over-limit');
+    } else {
+      inputEl.classList.remove('over-limit');
+    }
+
+    records[date][classId][field] = val;
+    saveRecords(records);
+    renderLedger();
+  }
+
+  function renderLedger(){
+    updateDayName();
+    const date = document.getElementById('regDate').value;
+    const records = loadRecords();
+    const dayRecord = records[date] || {};
+    const body = document.getElementById('ledgerBody');
+    body.innerHTML = '';
+
+    let totals = { boys:0, girls:0, total:0, boysP:0, girlsP:0, totalP:0, boysA:0, girlsA:0, totalA:0 };
+
+    CLASSES.forEach((cls, idx) => {
+      const enrolledTotal = cls.boys + cls.girls;
+      const rec = dayRecord[cls.id] || {};
+      const boysPresent = (rec.boysPresent === undefined || rec.boysPresent === null) ? '' : rec.boysPresent;
+      const girlsPresent = (rec.girlsPresent === undefined || rec.girlsPresent === null) ? '' : rec.girlsPresent;
+
+      const bP = boysPresent === '' ? 0 : clamp(parseInt(boysPresent,10), cls.boys);
+      const gP = girlsPresent === '' ? 0 : clamp(parseInt(girlsPresent,10), cls.girls);
+      const totalPresent = (boysPresent === '' && girlsPresent === '') ? '' : (bP + gP);
+
+      const bA = boysPresent === '' ? '' : Math.max(cls.boys - bP, 0);
+      const gA = girlsPresent === '' ? '' : Math.max(cls.girls - gP, 0);
+      const totalAbsent = (bA === '' && gA === '') ? '' : ((bA===''?0:bA) + (gA===''?0:gA));
+
+      const pct = (totalPresent === '' || enrolledTotal === 0) ? '—' : Math.round((totalPresent/enrolledTotal)*100) + '%';
+
+      totals.boys += cls.boys;
+      totals.girls += cls.girls;
+      totals.total += enrolledTotal;
+      if(boysPresent !== '') totals.boysP += bP;
+      if(girlsPresent !== '') totals.girlsP += gP;
+      if(totalPresent !== '') totals.totalP += totalPresent;
+      if(bA !== '') totals.boysA += bA;
+      if(gA !== '') totals.girlsA += gA;
+      if(totalAbsent !== '') totals.totalA += totalAbsent;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${idx+1}</td>
+        <td class="class-name">${cls.name}</td>
+        <td class="enrolled">${cls.boys}</td>
+        <td class="enrolled">${cls.girls}</td>
+        <td class="enrolled">${enrolledTotal}</td>
+        <td><input type="number" min="0" max="${cls.boys}" class="count-input" value="${boysPresent}" onchange="onCountChange('${cls.id}','boysPresent',this,${cls.boys})"></td>
+        <td><input type="number" min="0" max="${cls.girls}" class="count-input" value="${girlsPresent}" onchange="onCountChange('${cls.id}','girlsPresent',this,${cls.girls})"></td>
+        <td><strong>${totalPresent}</strong></td>
+        <td class="pct-cell">${pct}</td>
+      `;
+      body.appendChild(tr);
+    });
+
+    const overallPct = totals.total ? Math.round((totals.totalP/totals.total)*100) + '%' : '—';
+    const totalsRow = document.getElementById('ledgerTotals');
+    totalsRow.innerHTML = `
+      <td colspan="2">Total</td>
+      <td>${totals.boys}</td>
+      <td>${totals.girls}</td>
+      <td>${totals.total}</td>
+      <td>${totals.boysP}</td>
+      <td>${totals.girlsP}</td>
+      <td>${totals.totalP}</td>
+      <td>${overallPct}</td>
+    `;
+  }
+
+  function exportCSV(){
+    const records = loadRecords();
+    const dates = Object.keys(records).sort();
+    let rows = [['Date','Class','Boys Enrolled','Girls Enrolled','Total Enrolled','Boys Present','Girls Present','Total Present','Boys Absent','Girls Absent','Total Absent','Attendance %']];
+
+    dates.forEach(date => {
+      CLASSES.forEach(cls => {
+        const rec = records[date][cls.id];
+        if(!rec) return;
+        const bP = rec.boysPresent === undefined || rec.boysPresent === null ? '' : clamp(rec.boysPresent, cls.boys);
+        const gP = rec.girlsPresent === undefined || rec.girlsPresent === null ? '' : clamp(rec.girlsPresent, cls.girls);
+        if(bP === '' && gP === '') return;
+        const enrolledTotal = cls.boys + cls.girls;
+        const totalP = (bP===''?0:bP) + (gP===''?0:gP);
+        const bA = bP === '' ? cls.boys : cls.boys - bP;
+        const gA = gP === '' ? cls.girls : cls.girls - gP;
+        const totalA = bA + gA;
+        const pct = enrolledTotal ? Math.round((totalP/enrolledTotal)*100) : 0;
+        rows.push([date, cls.name, cls.boys, cls.girls, enrolledTotal, bP, gP, totalP, bA, gA, totalA, pct + '%']);
+      });
+    });
+
+    const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'GPS_Jatthay_Wala_Roznamcha.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  renderLedger();
+
+  // ---- Add to Home Screen ----
+  let deferredInstallPrompt = null;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    const note = document.getElementById('installNote');
+    note.className = 'install-note show';
+    note.innerHTML = '<strong>Installed.</strong> Roznamcha Hazri has been added to your home screen.';
+  });
+
+  function isIOS(){
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  }
+  function isInStandaloneMode(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+
+  async function handleInstallClick(){
+    const note = document.getElementById('installNote');
+
+    if(isInStandaloneMode()){
+      note.className = 'install-note show';
+      note.innerHTML = '<strong>Already installed.</strong> You\'re using Roznamcha Hazri from your home screen.';
+      return;
+    }
+
+    if(deferredInstallPrompt){
+      deferredInstallPrompt.prompt();
+      const result = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      if(result.outcome !== 'accepted'){
+        note.className = 'install-note show';
+        note.innerHTML = '<strong>Not installed.</strong> You can try again anytime using this button.';
+      }
+      return;
+    }
+
+    if(isIOS()){
+      note.className = 'install-note show';
+      note.innerHTML = `
+        <strong>Add to Home Screen (iPhone / iPad):</strong>
+        <ol>
+          <li>Tap the <strong>Share</strong> icon in Safari's toolbar.</li>
+          <li>Scroll down and tap <strong>Add to Home Screen</strong>.</li>
+          <li>Tap <strong>Add</strong> in the top right corner.</li>
+        </ol>
+      `;
+    } else {
+      note.className = 'install-note show';
+      note.innerHTML = `
+        <strong>Add to Home Screen:</strong>
+        <ol>
+          <li>Open the browser menu (usually three dots, top right).</li>
+          <li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+          <li>Confirm to add the shortcut.</li>
+        </ol>
+      `;
+    }
+  }
+</script>
+</body>
+</html>
